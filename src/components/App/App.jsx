@@ -25,12 +25,12 @@ class App extends Component {
     const { query, page, error } = this.state;
 
     if (prevState.query !== query || prevState.page !== page) {
-      this.setState(({ isLoading }) => ({ isLoading: true, error: null }));
+      this.setState({ isLoading: true, error: null });
 
       if (prevState.error !== error && error) {
         toast.error(error);
       }
-      fetchImages(query)
+      fetchImages(query, page)
         .then(({ hits, totalHits }) => {
           const imagesArray = hits.map(
             ({ id, tags, webformatURL, largeImageURL }) => ({
@@ -46,15 +46,13 @@ class App extends Component {
             return;
           }
 
-          return this.setState({
+          return this.setState(prevState => ({
             images: [...prevState.images, ...imagesArray],
             totalImages: totalHits,
-          });
+          }));
         })
         .catch(error => this.setState({ error: error.message }))
-        .finally(() =>
-          this.setState(({ isLoading }) => ({ isLoading: false }))
-        );
+        .finally(() => this.setState({ isLoading: false }));
     }
   }
 
